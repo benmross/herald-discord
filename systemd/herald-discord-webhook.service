@@ -1,0 +1,28 @@
+[Unit]
+Description=Herald — inbound webhook for Discord messages (HeraldForward Vencord plugin)
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+WorkingDirectory=%h/herald
+Environment=HOME=%h
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONUNBUFFERED=1
+# The webhook is extension code; this is how it finds the program.
+Environment=HERALD_ROOT=%h/herald
+Environment=HERALD_HOME=%h/.herald
+ExecStart=%h/herald/venv/bin/python %h/.herald/extensions/discord/bin/herald-discord-webhook
+Restart=always
+RestartSec=15
+
+NoNewPrivileges=true
+
+# 8 Sep 2026: a connection leak ate the default 1024 in seven hours.
+# The leak is gone, but headroom gives herald-watchdog several 5-minute
+# ticks to catch a future one at 85% instead of finding the corpse.
+LimitNOFILE=4096
+
+[Install]
+WantedBy=default.target

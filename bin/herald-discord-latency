@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+"""Read Discord's first-arrival delay observations. No network or writes."""
+import argparse
+import json
+import os
+import pathlib
+import shutil
+import sys
+
+EXT = pathlib.Path(__file__).resolve().parents[1]
+ROOT = os.environ.get("HERALD_ROOT") or str(pathlib.Path(shutil.which("herald")).resolve().parents[1])
+sys.path[:0] = [str(EXT / "lib"), str(pathlib.Path(ROOT) / "lib")]
+from herald import db
+from discord_latency import report
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--hours", type=float, default=24)
+parser.add_argument("--significant-seconds", type=float, default=300)
+args = parser.parse_args()
+with db.session() as con:
+    con.execute("PRAGMA query_only=ON")
+    result = report(con, hours=args.hours, significant_seconds=args.significant_seconds)
+print(json.dumps(result, indent=2))

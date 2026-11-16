@@ -1,0 +1,12 @@
+[Unit]
+Description=Herald — read new club announcements already delivered by Discord
+
+[Timer]
+OnCalendar=*-*-* *:10,40:00
+Persistent=true
+RandomizedDelaySec=120
+AccuracySec=1min
+Unit=herald-cycle@discord_events.service
+
+[Install]
+WantedBy=timers.target

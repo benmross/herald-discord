@@ -1,0 +1,59 @@
+{
+  "name": "discord",
+  "description": "Discord messages from the servers and DMs your own client can see, forwarded live by a Vencord plugin, with selected club channels read for events and opportunities.",
+  "version": "0.1.0",
+  "provides_capabilities": [
+    {
+      "key": "discord",
+      "title": "Discord",
+      "summary": "Live messages from the servers and DMs your own Discord client can see.",
+      "secrets": [
+        "discord.webhook_token"
+      ],
+      "setup_hint": "See README.md in the extension."
+    }
+  ],
+  "sources": {
+    "discord": {
+      "search": {
+        "message": "chat"
+      }
+    }
+  },
+  "setup": [
+    {
+      "key": "discord.webhook_token",
+      "secret": true,
+      "prompt": "A long random token the plugin sends with each message, so only your client can post to Herald",
+      "example": "generate one with: openssl rand -hex 32"
+    },
+    {
+      "key": "discord.webhook_bind",
+      "prompt": "The address the webhook listens on, port 8791: this machine's Tailscale or LAN IP, reachable from the computer running Discord",
+      "example": "100.64.0.5"
+    },
+    {
+      "key": "discord.watch_channels",
+      "type": "object",
+      "required": false,
+      "prompt": "Channels to read for events and opportunities: channel id mapped to its guild id and flags",
+      "example": "{\"123\": {\"guild_id\": \"456\", \"events\": true, \"opportunities\": true}}"
+    },
+    {
+      "key": "discord.exclude_terms",
+      "type": "list",
+      "required": false,
+      "prompt": "Words that keep a message away from any model, e.g. a course code whose material must stay private"
+    },
+    {
+      "key": "discord.after_events_collect",
+      "required": false,
+      "prompt": "A collector to run when new events are found, such as a calendar publisher"
+    }
+  ],
+  "steps": [
+    "Build Vencord with plugin/heraldForward as a user plugin and point Vesktop at it (README.md, Installing the plugin).",
+    "In the plugin's settings, set the URL to this machine's webhook address and the token to the one you stored.",
+    "herald ext enable discord, then herald services install and herald services enable."
+  ]
+}
